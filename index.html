@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elora — AI Virtual Assistant for the Futuristic Perfume House</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        obsidian: '#0B0B0D',
+        onyx: '#131316',
+        ivory: '#F5F1E8',
+        gold: '#C9A96E',
+        goldsoft: '#D4B87A',
+        ombre: '#8B6F47',
+        mist: '#9B9589',
+        line: 'rgba(255,255,255,0.08)'
+      },
+      fontFamily: {
+        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif']
+      },
+      borderRadius: {
+        '4xl': '2rem'
+      },
+      boxShadow: {
+        gold: '0 8px 40px rgba(201,169,110,0.18)',
+        card: '0 20px 60px rgba(0,0,0,0.45)'
+      },
+      letterSpacing: {
+        widest2: '0.3em'
+      }
+    }
+  }
+}
+</script>
+<style>
+  /* ===== Base ===== */
+  ::selection { background: rgba(201,169,110,0.35); color: #fff; }
+  body {
+    background: #0B0B0D;
+    color: #F5F1E8;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9999;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+  :focus-visible { outline: 2px solid #C9A96E; outline-offset: 3px; }
+  input, button { font: inherit; }
+
+  /* ===== Scroll reveal ===== */
+  .rv { opacity: 0; transform: translateY(44px); transition: opacity .85s cubic-bezier(.22,.61,.36,1), transform .85s cubic-bezier(.22,.61,.36,1); }
+  .rv.on { opacity: 1; transform: translateY(0); }
+
+  /* ===== Nav motion ===== */
+  .nav-dot {
+    position: absolute; bottom: -2px; height: 2px;
+    background: linear-gradient(90deg, #C9A96E, #F5E3C0);
+    border-radius: 999px;
+    transition: left .5s cubic-bezier(.22,.61,.36,1), width .5s cubic-bezier(.22,.61,.36,1);
+  }
+  .nav-link { position: relative; transition: color .3s ease; }
+  .nav-link:hover { color: #F5F1E8; }
+  .navbar-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  @keyframes borderSweep {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  .nav-sheen {
+    background: linear-gradient(90deg, transparent, rgba(201,169,110,.35), transparent);
+    background-size: 200% 100%;
+    animation: borderSweep 5s linear infinite;
+  }
+
+  /* ===== Hero glow / orb ===== */
+  @keyframes floatGlow {
+    0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: .55; }
+    50% { transform: translate(-50%,-52%) scale(1.12); opacity: .95; }
+  }
+  .orb { animation: floatGlow 7s ease-in-out infinite; }
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+  .spin-slow { animation: spinSlow 26s linear infinite; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-anim { opacity: 0; animation: fadeUp .9s ease-out forwards; }
+  .hero-anim.d1 { animation-delay: .15s; }
+  .hero-anim.d2 { animation-delay: .35s; }
+  .hero-anim.d3 { animation-delay: .55s; }
+  .hero-anim.d4 { animation-delay: .75s; }
+  .hero-anim.d5 { animation-delay: .95s; }
+
+  /* ===== Typing dots ===== */
+  @keyframes blink { 0%,80%,100% { opacity:.2; transform: translateY(0);} 40% { opacity:1; transform: translateY(-4px);} }
+  .tdot { animation: blink 1.3s ease-in-out infinite; }
+  .tdot:nth-child(2){ animation-delay:.2s } .tdot:nth-child(3){ animation-delay:.4s }
+
+  /* ===== Gold border shimmer on hover ===== */
+  .gold-card { position: relative; transition: transform .5s ease, border-color .5s ease; }
+  .gold-card::before {
+    content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(120deg, transparent 30%, rgba(201,169,110,.8) 50%, transparent 70%);
+    background-size: 250% 100%;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0; transition: opacity .6s ease;
+    pointer-events: none;
+  }
+  .gold-card:hover::before { opacity: 1; animation: sheen 1.4s ease forwards; }
+  @keyframes sheen { 0% { background-position: 100% 0; } 100% { background-position: 0% 0; } }
+
+  /* ===== Radar chart draw ===== */
+  .radar-poly { stroke-dasharray: 1200; stroke-dashoffset: 1200; animation: draw 2s ease-out forwards; }
+  .radar-fill { animation: fadeIn 1.6s ease-out .8s forwards; opacity: 0; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* ===== Live ticker ===== */
+  .live-dot::before {
+    content:''; position:absolute; inset:0; border-radius:999px;
+    background: rgba(201,169,110,.5); animation: pingSlow 2s cubic-bezier(0,0,.2,1) infinite;
+  }
+  @keyframes pingSlow { 0% { transform: scale(1); opacity:1;} 75%,100% { transform: scale(2.6); opacity:0;} }
+
+  /* ===== Marquee ===== */
+  @keyframes marquee { from { transform: translateX(0);} to { transform: translateX(-50%);} }
+  .marquee-track { animation: marquee 30s linear infinite; }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+
+  /* ===== FAQ ===== */
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height .5s ease; position: relative; }
+  .faq-item.open .faq-a { max-height: 300px; }
+  .faq-item.open .plus-icon { transform: rotate(45deg); }
+  .plus-icon { transition: transform .4s ease; }
+
+  /* ===== Reduced motion ===== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+    .rv { opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body class="bg-obsidian text-ivory antialiased">
+
+<!-- ============================================================
+     NAVBAR — motion: blur-on-scroll, magnetic links, sliding dot
+============================================================ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-700">
+  <div class="relative max-w-7xl mx-auto px-5 sm:px-8">
+    <nav class="flex items-center justify-between h-16 sm:h-20" aria-label="Main">
+      <!-- Logo -->
+      <a href="#top" class="group flex items-center gap-2.5" aria-label="Elora home">
+        <span class="relative flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-gold/10 transition-transform duration-500 group-hover:rotate-180">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" stroke-width="1.5"><path d="M12 2C7 7 4 11 4 15a8 8 0 0 0 16 0c0-4-3-8-8-13z"/></svg>
+        </span>
+        <span class="font-display text-2xl tracking-wide text-ivory">Elora<span class="text-gold">.</span></span>
+      </a>
+
+      <!-- Center links -->
+      <ul class="relative hidden md:flex items-center gap-9" id="navLinks">
+        <span class="nav-dot" id="navDot" aria-hidden="true"></span>
+        <li><a href="#features" class="nav-link text-[0.78rem] uppercase tracking-widest2 text-mist">Features</a></li>
+        <li><a href="#dashboard" class="nav-link text-[0.78rem] uppercase tracking-widest2 text-mist">Dashboard</a></li>
+        <li><a href="#demo" class="nav-link text-[0.78rem] uppercase tracking-widest2 text-mist">Live Demo</a></li>
+        <li><a href="#pricing" class="nav-link text-[0.78rem] uppercase tracking-widest2 text-mist">Pricing</a></li>
+        <li><a href="#faq" class="nav-link text-[0.78rem] uppercase tracking-widest2 text-mist">FAQ</a></li>
+      </ul>
+
+      <!-- Right -->
+      <div class="flex items-center gap-3">
+        <button class="hidden sm:inline-flex overflow-hidden relative group rounded-full border border-gold/50 px-6 py-2.5 text-[0.78rem] uppercase tracking-widest2 text-gold transition-all duration-500 hover:shadow-gold hover:bg-gold hover:text-obsidian">
+          <span class="nav-sheen absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+          Request Access
+        </button>
+        <!-- Hamburger -->
+        <button id="burger" class="md:hidden flex flex-col gap-[5px] p-2 rounded-lg" aria-label="Open menu" aria-expanded="false">
+          <span class="block h-[1.5px] w-6 bg-ivory transition-all duration-400"></span>
+          <span class="block h-[1.5px] w-4 bg-gold transition-all duration-400"></span>
+          <span class="block h-[1.5px] w-6 bg-ivory transition-all duration-400"></span>
+        </button>
+      </div>
+    </nav>
+  </div>
+  <!-- bottom hairline -->
+  <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/25 to-transparent"></div>
+</header>
+
+<!-- Mobile menu overlay -->
+<div id="mobileMenu" class="fixed inset-0 z-40 hidden flex-col items-center justify-center gap-8 bg-obsidian/95 navbar-blur opacity-0 transition-opacity duration-500" role="dialog" aria-label="Mobile navigation">
+  <a href="#features" class="mobile-link font-display text-3xl text-ivory hover:text-gold transition-colors">Features</a>
+  <a href="#dashboard" class="mobile-link font-display text-3xl text-ivory hover:text-gold transition-colors">Dashboard</a>
+  <a href="#demo" class="mobile-link font-display text-3xl text-ivory hover:text-gold transition-colors">Live Demo</a>
+  <a href="#pricing" class="mobile-link font-display text-3xl text-ivory hover:text-gold transition-colors">Pricing</a>
+  <a href="#faq" class="mobile-link font-display text-3xl text-ivory hover:text-gold transition-colors">FAQ</a>
+  <button class="mt-4 rounded-full border border-gold px-8 py-3 text-xs uppercase tracking-widest2 text-gold hover:bg-gold hover:text-obsidian transition-all duration-500">Request Access</button>
+</div>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section id="top" class="relative flex min-h-screen items-center justify-center overflow-hidden px-5 pt-32 pb-16 text-center">
+  <!-- glass panel behind orb -->
+  <div class="hero-anim d1 absolute left-1/2 top-32 -z-10 h-[34rem] w-[34rem] -translate-x-1/2 sm:h-[44rem] sm:w-[44rem]">
+    <div class="orb absolute inset-0 rounded-full" style="background: radial-gradient(circle, rgba(201,169,110,.14) 0%, transparent 62%);"></div>
+    <div class="spin-slow absolute inset-10 rounded-full border border-dashed border-gold/15"></div>
+  </div>
+
+  <div class="relative max-w-4xl">
+    <p class="hero-anim d2 inline-flex items-center gap-3 rounded-full border border-line bg-white/[0.03] px-5 py-2 text-[0.7rem] uppercase tracking-widest2 text-gold">
+      <span class="relative inline-flex h-2 w-2 rounded-full bg-gold live-dot"></span>
+      Your Personal AI Concierge
+    </p>
+
+    <h1 class="hero-anim d3 mt-8 font-display text-[3.2rem] leading-[0.98] font-light sm:text-7xl lg:text-[5.6rem]">
+      The perfume house<br>
+      <em class="italics text-gold" style="font-style:italic">reimagined</em> by AI.
+    </h1>
+
+    <p class="hero-anim d4 mx-auto mt-7 max-w-xl text-base font-light leading-relaxed text-mist sm:text-lg">
+      Elora is your virtual assistant for the fragrance atelier — it reads scent notes,
+      composes harmonious blends, and curates a signature wardrobe that is unmistakably you.
+    </p>
+
+    <div class="hero-anim d5 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <button class="group relative w-full overflow-hidden rounded-full bg-gold px-8 py-4 text-[0.8rem] font-medium uppercase tracking-widest2 text-obsidian transition-all duration-500 hover:shadow-gold hover:-translate-y-0.5 sm:w-auto">
+        <span class="relative z-10">Experience Elora</span>
+        <span class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+      </button>
+      <button class="w-full rounded-full border border-white/15 px-8 py-4 text-[0.8rem] uppercase tracking-widest2 text-ivory transition-all duration-500 hover:border-gold hover:text-gold hover:-translate-y-0.5 sm:w-auto">
+        Watch Demo
+      </button>
+    </div>
+
+    <div class="hero-anim d5 mt-14 flex items-center justify-center gap-8 text-[0.7rem] uppercase tracking-widest2 text-mist/70">
+      <span class="flex items-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" stroke-width="2"><path d="M12 22c4-4 8-7.5 8-12a8 8 0 1 0-16 0c0 4.5 4 8 8 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        End-to-end encrypted
+      </span>
+      <span class="hidden h-4 w-px bg-line sm:block"></span>
+      <span class="flex items-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        12k+ fragrance profiles
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TRUST MARQUEE
+============================================================ -->
+<section class="border-y border-line py-10">
+  <p class="mb-8 text-center text-[0.7rem] uppercase tracking-widest2 text-mist">Trusted by houses &amp; collectors around the world</p>
+  <div class="marquee relative overflow-hidden">
+    <div class="marquee-track flex w-max items-center gap-16 pr-16">
+      <span class="font-display text-2xl font-semibold text-ivory/30">CHANEL</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">DIOR</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">TOM FORD</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">CREED</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">MAISON MARTIN MARGIELA</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">BYREDO</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">CHANEL</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">DIOR</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">TOM FORD</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">CREED</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">MAISON MARTIN MARGIELA</span>
+      <span class="font-display text-2xl font-semibold text-ivory/30">BYREDO</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES — Bento
+============================================================ -->
+<section id="features" class="mx-auto max-w-7xl px-5 py-28 sm:px-8">
+  <div class="rv mx-auto max-w-2xl text-center">
+    <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">Crafted for the connoisseur</p>
+    <h2 class="mt-4 font-display text-4xl font-light sm:text-5xl">An intelligence steeped in scent</h2>
+  </div>
+
+  <div class="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Card 1: large -->
+    <div class="gold-card rv lg:col-span-2 rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22c4-4 8-7.5 8-12a8 8 0 1 0-16 0c0 4.5 4 8 8 12z"/></svg>
+      </div>
+      <h3 class="mt-6 font-display text-2xl">Note Reading</h3>
+      <p class="mt-2 max-w-md text-sm leading-relaxed text-mist">Elora decodes the olfactory pyramid of any fragrance — top, heart, and base — and explains, in plain language, how each note behaves on skin and in the air.</p>
+      <div class="mt-6 flex flex-wrap gap-2">
+        <span class="rounded-full border border-line px-3 py-1 text-xs text-mist">Bergamot</span>
+        <span class="rounded-full border border-line px-3 py-1 text-xs text-mist">Sandalwood</span>
+        <span class="rounded-full border border-line px-3 py-1 text-xs text-mist">Iris</span>
+        <span class="rounded-full border border-line px-3 py-1 text-xs text-mist">Ambroxan</span>
+        <span class="rounded-full border-gold/30 px-3 py-1 text-xs text-gold" style="border:1px solid rgba(201,169,110,.3)">+ 2,400 notes</span>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="gold-card rv rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l1.9 5.8h6.1l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 8.8h6.1z"/></svg>
+      </div>
+      <h3 class="mt-6 font-display text-2xl">Blend Composer</h3>
+      <p class="mt-2 text-sm leading-relaxed text-mist">Layering is an art. Elora proposes complementary accords and warns you before a clash — your fragrance stays harmonious.</p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="gold-card rv rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      </div>
+      <h3 class="mt-6 font-display text-2xl">Voice Concierge</h3>
+      <p class="mt-2 text-sm leading-relaxed text-mist">Ask hands-free: "What should I wear for a candlelit dinner in Milan?" Elora answers in six languages.</p>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="gold-card rv rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l3-5 4 7 5-9"/></svg>
+      </div>
+      <h3 class="mt-6 font-display text-2xl">Wardrobe Analytics</h3>
+      <p class="mt-2 text-sm leading-relaxed text-mist">See your collection's note profile, wear-frequency, and seasonal fit in a single elegant dashboard.</p>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="gold-card rv rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <h3 class="mt-6 font-display text-2xl">Disruption Alerts</h3>
+      <p class="mt-2 text-sm leading-relaxed text-mist">Track commodity prices, harvest conditions, and reformulations before they change your favorites.</p>
+    </div>
+
+    <!-- Card 6: large -->
+    <div class="gold-card rv lg:col-span-2 rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3 class="mt-6 font-display text-2xl">Private by Design</h3>
+      <p class="mt-2 max-w-md text-sm leading-relaxed text-mist">Your olfactory identity — how you smell, what you love, your skin chemistry — is stored zero-access encrypted. Never sold. Never trained on. Ever.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     DASHBOARD — luxurious futuristic perfumery control room
+============================================================ -->
+<section id="dashboard" class="relative mx-auto max-w-7xl px-5 py-28 sm:px-8">
+  <!-- radial ambient -->
+  <div class="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full" style="background: radial-gradient(circle, rgba(201,169,110,.07), transparent 60%);"></div>
+
+  <div class="rv mx-auto max-w-2xl text-center">
+    <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">The control room</p>
+    <h2 class="mt-4 font-display text-4xl font-light sm:text-5xl">Your atelier, in one glance</h2>
+    <p class="mt-5 text-mist">A living dashboard that breathes with your collection.</p>
+  </div>
+
+  <div class="rv mt-16 overflow-hidden rounded-4xl border border-line bg-onyx/80 backdrop-blur-xl shadow-card">
+    <!-- Dashboard chrome -->
+    <div class="flex items-center justify-between border-b border-line px-6 py-4">
+      <div class="flex items-center gap-4">
+        <div class="flex gap-1.5">
+          <span class="h-3 w-3 rounded-full bg-white/15"></span>
+          <span class="h-3 w-3 rounded-full bg-white/15"></span>
+          <span class="h-3 w-3 rounded-full bg-gold/50"></span>
+        </div>
+        <span class="text-xs text-mist">elora.atelier/wardrobe</span>
+      </div>
+      <span class="relative inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/5 px-3 py-1 text-[0.65rem] uppercase tracking-widest2 text-gold">
+        <span class="relative flex h-1.5 w-1.5 rounded-full bg-gold live-dot"></span>
+        AI online
+      </span>
+    </div>
+
+    <!-- Dashboard body -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+      <!-- Sidebar -->
+      <aside class="hidden lg:flex flex-col justify-between gap-4 border-r border-line p-6 lg:col-span-2">
+        <nav class="flex flex-col gap-1 text-sm">
+          <a href="#" class="flex items-center gap-3 rounded-xl bg-gold/10 border border-gold/20 px-4 py-2.5 text-ivory">
+            <span class="h-2 w-2 rounded-full bg-gold"></span> Overview
+          </a>
+          <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-mist hover:text-ivory transition-colors">
+            <span class="h-2 w-2 rounded-full border border-mist"></span> Collection
+          </a>
+          <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-mist hover:text-ivory transition-colors">
+            <span class="h-2 w-2 rounded-full border border-mist"></span> Blends
+          </a>
+          <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-mist hover:text-ivory transition-colors">
+            <span class="h-2 w-2 rounded-full border border-mist"></span> Harvests
+          </a>
+          <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-mist hover:text-ivory transition-colors">
+            <span class="h-2 w-2 rounded-full border border-mist"></span> Alerts
+          </a>
+        </nav>
+        <div class="rounded-2xl border border-line bg-obsidian/60 p-4">
+          <p class="text-[0.65rem] uppercase tracking-widest2 text-gold">Onboarding</p>
+          <div class="mt-3 h-1.5 rounded-full bg-white/10"><div class="h-full w-[72%] rounded-full bg-gradient-to-r from-gold to-goldsoft"></div></div>
+          <p class="mt-2 text-[0.7rem] text-mist">72% of your library mapped</p>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <div class="p-6 sm:p-8 lg:col-span-10">
+        <!-- KPI row -->
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div class="rounded-3xl border border-line bg-white/[0.02] p-5">
+            <p class="text-[0.65rem] uppercase tracking-widest2 text-mist">Bottles</p>
+            <p class="mt-2 font-display text-3xl" data-count="248">0</p>
+            <p class="mt-1 text-xs text-gold">+12 this season</p>
+          </div>
+          <div class="rounded-3xl border border-line bg-white/[0.02] p-5">
+            <p class="text-[0.65rem] uppercase tracking-widest2 text-mist">Signature blends</p>
+            <p class="mt-2 font-display text-3xl" data-count="36">0</p>
+            <p class="mt-1 text-xs text-gold">3 in progress</p>
+          </div>
+          <div class="rounded-3xl border border-line bg-white/[0.02] p-5">
+            <p class="text-[0.65rem] uppercase tracking-widest2 text-mist">Scent matches</p>
+            <p class="mt-2 font-display text-3xl" data-count="98">0</p>
+            <p class="mt-1 text-xs text-gold">% precision</p>
+          </div>
+          <div class="rounded-3xl border border-line bg-white/[0.02] p-5">
+            <p class="text-[0.65rem] uppercase tracking-widest2 text-mist">Atelier value</p>
+            <p class="mt-2 font-display text-3xl" data-count="41"><span class="text-xl align-top">$</span>0</p>
+            <p class="mt-1 text-xs text-gold">in gold, 000s</p>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <!-- Radar -->
+          <div class="rounded-3xl border border-line bg-white/[0.02] p-6 lg:col-span-5">
+            <div class="flex items-center justify-between">
+              <p class="text-[0.7rem] uppercase tracking-widest2 text-mist">Olfactory profile</p>
+            </div>
+            <svg viewBox="0 0 260 260" class="mx-auto mt-4 w-full max-w-[240px]" role="img" aria-label="Radar chart of your olfactory profile">
+              <!-- rings -->
+              <g fill="none" stroke="rgba(255,255,255,.07)">
+                <circle cx="130" cy="130" r="30"/><circle cx="130" cy="130" r="60"/>
+                <circle cx="130" cy="130" r="90"/><circle cx="130" cy="130" r="120"/>
+              </g>
+              <!-- spokes -->
+              <g stroke="rgba(255,255,255,.07)">
+                <line x1="130" y1="10" x2="130" y2="250"/>
+                <line x1="10" y1="130" x2="250" y2="130"/>
+                <line x1="45" y1="45" x2="215" y2="215"/>
+                <line x1="45" y1="215" x2="215" y2="45"/>
+              </g>
+              <!-- polygon -->
+              <polygon class="radar-fill" points="130,35 192,82 216,164 155,220 105,220 58,174 44,96" fill="rgba(201,169,110,.14)" stroke="none"/>
+              <polyline class="radar-poly" points="130,35 192,82 216,164 155,220 105,220 58,174 44,96 130,35" fill="none" stroke="#C9A96E" stroke-width="1.5"/>
+              <!-- axis labels -->
+              <g fill="#9B9589" font-size="9" font-family="Inter" text-anchor="middle">
+                <text x="130" y="18">Fresh</text>
+                <text x="238" y="135">Woody</text>
+                <text x="130" y="248">Amber</text>
+                <text x="20" y="135">Green</text>
+                <text x="215" y="212" transform="translate(0,-4)">Spicy</text>
+                <text x="36" y="226">Floral</text>
+                <text x="190" y="30" transform="translate(-6,-2)">Citrus</text>
+              </g>
+            </svg>
+            <p class="mt-3 text-center text-xs text-mist">Fresh-leaning, iris-led profile</p>
+          </div>
+
+          <!-- AI recommendation feed -->
+          <div class="rounded-3xl border border-line bg-white/[0.02] p-6 lg:col-span-4">
+            <div class="flex items-center justify-between">
+              <p class="text-[0.7rem] uppercase tracking-widest2 text-mist">Elora's curation</p>
+              <span class="text-[0.65rem] text-gold">live</span>
+            </div>
+            <ul class="mt-5 flex flex-col gap-3">
+              <li class="flex items-center gap-3 rounded-2xl border border-gold/20 bg-gold/5 p-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 text-sm">I</span>
+                <div>
+                  <p class="text-sm leading-tight text-ivory">Iris Pallida — pairs with sweet amber for an evening accord.</p>
+                  <p class="mt-0.5 text-[0.6rem] uppercase tracking-widest2 text-mist">Harmony 94%</p>
+                </div>
+              </li>
+              <li class="flex items-center gap-3 rounded-2xl border border-line p-3 opacity-70">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-sm">V</span>
+                <div>
+                  <p class="text-sm leading-tight text-ivory">Vetiver harvest shifts — 2 recommendations pending.</p>
+                  <p class="mt-0.5 text-[0.6rem] uppercase tracking-widest2 text-mist">Alert</p>
+                </div>
+              </li>
+              <li class="flex items-center gap-3 rounded-2xl border border-line p-3 opacity-50">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-sm">N</span>
+                <div>
+                  <p class="text-sm leading-tight text-ivory">Neroli restock threshold reached in 6 days.</p>
+                  <p class="mt-0.5 text-[0.6rem] uppercase tracking-widest2 text-mist">Reminder</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sparkline / week -->
+          <div class="rounded-3xl border border-line bg-white/[0.02] p-6 lg:col-span-3">
+            <p class="text-[0.7rem] uppercase tracking-widest2 text-mist">Worn this week</p>
+            <div class="mt-5 flex h-32 items-end justify-between gap-2">
+              <div class="w-full rounded-t-md bg-gold/20" style="height:38%"></div>
+              <div class="w-full rounded-t-md bg-gold/35" style="height:56%"></div>
+              <div class="w-full rounded-t-md bg-gold/50" style="height:44%"></div>
+              <div class="w-full rounded-t-md bg-gold/70" style="height:78%"></div>
+              <div class="w-full rounded-t-md bg-gold" style="height:100%"></div>
+              <div class="w-full rounded-t-md bg-gold/55" style="height:62%"></div>
+              <div class="w-full rounded-t-md bg-gold/30" style="height:40%"></div>
+            </div>
+            <div class="mt-3 flex justify-between text-[0.6rem] uppercase tracking-wider text-mist">
+              <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+            </div>
+            <p class="mt-4 text-xs text-gold">Peak: Friday ❤</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIVE DEMO CHAT
+============================================================ -->
+<section id="demo" class="mx-auto max-w-3xl px-5 py-28 sm:px-8">
+  <div class="rv mx-auto max-w-2xl text-center">
+    <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">Live interaction</p>
+    <h2 class="mt-4 font-display text-4xl font-light sm:text-5xl">Ask Elora anything</h2>
+    <p class="mt-5 text-mist">Scent notes, layering, accidental mixing mishaps — she has an opinion on all of it.</p>
+  </div>
+
+  <div class="rv mt-12 overflow-hidden rounded-4xl border border-line bg-onyx/80 backdrop-blur-xl shadow-card">
+    <div class="flex items-center gap-3 border-b border-line px-6 py-4">
+      <div class="relative">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gold to-ombre text-sm font-semibold text-obsidian">E</span>
+        <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-onyx bg-green-400"></span>
+      </div>
+      <div>
+        <p class="text-sm font-medium">Elora</p>
+        <p class="text-[0.7rem] text-mist">Perfume AI Concierge · online</p>
+      </div>
+    </div>
+
+    <div id="chat" class="flex max-h-[420px] min-h-[340px] flex-col gap-3 overflow-y-auto p-6" role="log" aria-live="polite">
+      <div class="ai-msg max-w-[82%] self-start rounded-3xl rounded-tl-md border border-line bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-mist">
+        Welcome to the atelier. Ask me about <span class="text-ivory">scent notes</span> — or try
+        <span class="text-gold">"mix sandalwood with vanilla"</span> to see a live blend recommendation.
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 border-t border-line px-5 py-4">
+      <input id="chatInput" type="text" placeholder="Ask about a note, a blend, a scent…"
+             class="flex-1 rounded-full border border-line bg-white/[0.03] px-5 py-3 text-sm text-ivory outline-none placeholder:text-mist/60 focus:border-gold/50 transition-colors duration-500"
+             aria-label="Chat message" autocomplete="off">
+      <button id="chatSend" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold text-obsidian transition-all duration-500 hover:bg-goldsoft hover:scale-105 active:scale-95" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- quick prompts -->
+  <div class="rv mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
+    <button class="chip rounded-full border border-line px-4 py-2 text-mist transition-all duration-300 hover:border-gold hover:text-gold">🌿 What is oakmoss?</button>
+    <button class="chip rounded-full border border-line px-4 py-2 text-mist transition-all duration-300 hover:border-gold hover:text-gold">Mix jasmine with citrus</button>
+    <button class="chip rounded-full border border-line px-4 py-2 text-mist transition-all duration-300 hover:border-gold hover:text-gold">Best night-out oud</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIALS
+============================================================ -->
+<section class="mx-auto max-w-7xl px-5 py-28 sm:px-8">
+  <div class="rv mx-auto max-w-2xl text-center">
+    <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">Voices</p>
+    <h2 class="mt-4 font-display text-4xl font-light sm:text-5xl">Loved by the olfactory elite</h2>
+  </div>
+  <div class="mt-16 grid grid-cols-1 gap-5 md:grid-cols-3">
+    <figure class="gold-card rv rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <svg class="h-6 w-6 text-gold/60" viewBox="0 0 24 24" fill="currentColor"><path d="M9.6 4C6 6 3.5 9.6 3.5 14a6.5 6.5 0 1 0 13 0 6.7 6.7 0 0 0-6.4-6.7c-.7 0-1.6.2-2 .3.4-1 1-2.3 1.8-3L9.6 4zm11 0C17 6 14.5 9.6 14.5 14a6.5 6.5 0 1 0 13 0 6.7 6.7 0 0 0-6.4-6.7c-.7 0-1.6.2-2 .3.4-1 1-2.3 1.8-3L20.6 4z"/></svg>
+      <blockquote class="mt-5 font-display text-lg italic leading-relaxed text-mist">
+        "Elora found a blend of iris and raw amber I've chased for a decade. The recommendation engine is uncanny."
+      </blockquote>
+      <figcaption class="mt-6 flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 font-display text-sm text-gold">A</span>
+        <div>
+          <p class="text-sm font-medium">Amara Vance</p>
+          <p class="text-xs text-mist">Nose · Grasse, France</p>
+        </div>
+      </figcaption>
+    </figure>
+    <figure class="gold-card rv rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <svg class="h-6 w-6 text-gold/60" viewBox="0 0 24 24" fill="currentColor"><path d="M9.6 4C6 6 3.5 9.6 3.5 14a6.5 6.5 0 1 0 13 0 6.7 6.7 0 0 0-6.4-6.7c-.7 0-1.6.2-2 .3.4-1 1-2.3 1.8-3L9.6 4zm11 0C17 6 14.5 9.6 14.5 14a6.5 6.5 0 1 0 13 0 6.7 6.7 0 0 0-6.4-6.7c-.7 0-1.6.2-2 .3.4-1 1-2.3 1.8-3L20.6 4z"/></svg>
+      <blockquote class="mt-5 font-display text-lg italic leading-relaxed text-mist">
+        "The dashboard turns our atelier's chaos into calm. Harvest intel alone paid for a year of Elora."
+      </blockquote>
+      <figcaption class="mt-6 flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 font-display text-sm text-gold">K</span>
+        <div>
+          <p class="text-sm font-medium">Kai Renner</p>
+          <p class="text-xs text-mist">Creative Director · Modena</p>
+        </div>
+      </figcaption>
+    </figure>
+    <figure class="gold-card rv rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm hover:-translate-y-1.5">
+      <svg class="h-6 w-6 text-gold/60" viewBox="0 0 24 24" fill="currentColor"><path d="M9.6 4C6 6 3.5 9.6 3.5 14a6.5 6.5 0 1 0 13 0 6.7 6.7 0 0 0-6.4-6.7c-.7 0-1.6.2-2 .3.4-1 1-2.3 1.8-3L9.6 4zm11 0C17 6 14.5 9.6 14.5 14a6.5 6.5 0 1 0 13 0 6.7 6.7 0 0 0-6.4-6.7c-.7 0-1.6.2-2 .3.4-1 1-2.3 1.8-3L20.6 4z"/></svg>
+      <blockquote class="mt-5 font-display text-lg italic leading-relaxed text-mist">
+        "A 'Private by Design' concierge that actually means it. My olfactory library finally feels safe."
+      </blockquote>
+      <figcaption class="mt-6 flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 font-display text-sm text-gold">S</span>
+        <div>
+          <p class="text-sm font-medium">Sofía Laurent</p>
+          <p class="text-xs text-mist">Collector · New York</p>
+        </div>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================================================
+     HOW IT WORKS
+============================================================ -->
+<section class="border-y border-line">
+  <div class="mx-auto max-w-5xl px-5 py-28 sm:px-8">
+    <div class="rv mx-auto max-w-2xl text-center">
+      <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">Three steps</p>
+      <h2 class="mt-4 font-display text-4xl font-light sm:text-5xl">From curiosity to signature</h2>
+    </div>
+    <div class="mt-16 grid grid-cols-1 gap-12 md:grid-cols-3">
+      <div class="rv relative text-center">
+        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-gold font-display text-2xl text-gold transition-all duration-500 hover:bg-gold hover:text-obsidian hover:shadow-gold">1</div>
+        <h3 class="mt-6 font-display text-2xl">Connect</h3>
+        <p class="mx-auto mt-2 max-w-[16rem] text-sm text-mist">Tell Elora your taste, your skin, and the moods you dress for.</p>
+      </div>
+      <div class="rv relative text-center">
+        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-gold font-display text-2xl text-gold transition-all duration-500 hover:bg-gold hover:text-obsidian hover:shadow-gold">2</div>
+        <h3 class="mt-6 font-display text-2xl">Delegate</h3>
+        <p class="mx-auto mt-2 max-w-[16rem] text-sm text-mist">She scans thousands of accords to find what makes you unforgettable.</p>
+      </div>
+      <div class="rv relative text-center">
+        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-gold font-display text-2xl text-gold transition-all duration-500 hover:bg-gold hover:text-obsidian hover:shadow-gold">3</div>
+        <h3 class="mt-6 font-display text-2xl">Reveal</h3>
+        <p class="mx-auto mt-2 max-w-[16rem] text-sm text-mist">Receive a curated wardrobe, blend-ready, and quietly luxurious.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRICING
+============================================================ -->
+<section id="pricing" class="mx-auto max-w-6xl px-5 py-28 sm:px-8">
+  <div class="rv mx-auto max-w-2xl text-center">
+    <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">Membership</p>
+    <h2 class="mt-4 font-display text-4xl font-light sm:text-5xl">Choose your devotion</h2>
+    <div class="mt-8 inline-flex items-center gap-4 rounded-full border border-line bg-white/[0.02] px-6 py-3">
+      <span id="lblMonthly" class="text-sm text-ivory transition-colors">Monthly</span>
+      <button id="billingToggle" role="switch" aria-checked="false" aria-label="Toggle annual billing"
+              class="relative h-7 w-14 rounded-full border border-line bg-white/[0.06] transition-colors duration-500">
+        <span class="absolute top-1 left-1 h-5 w-5 rounded-full bg-gold transition-transform duration-500" id="toggleKnob"></span>
+      </button>
+      <span id="lblAnnual" class="text-sm text-mist transition-colors">Annual <span class="text-gold">−20%</span></span>
+    </div>
+  </div>
+
+  <div class="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+    <!-- Essential -->
+    <div class="gold-card rv flex flex-col rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm">
+      <h3 class="font-display text-2xl">Discovery</h3>
+      <div class="mt-5 flex items-baseline gap-1">
+        <span class="font-display text-5xl font-light text-gold"><span class="price-el">9</span></span>
+        <span class="text-sm text-mist">/month</span>
+      </div>
+      <p class="mt-2 text-sm text-mist">For the curious enthusiast</p>
+      <ul class="mt-7 flex flex-1 flex-col gap-3.5 text-sm text-mist">
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>10 scent queries a day</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Basic note breakdowns</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Seasonal suggestions</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Community atelier</li>
+      </ul>
+      <button class="mt-9 w-full rounded-full border border-line py-3.5 text-xs uppercase tracking-widest2 text-ivory transition-all duration-500 hover:border-gold hover:text-gold">Begin</button>
+    </div>
+
+    <!-- Signature -->
+    <div class="gold-card rv relative rounded-4xl border border-gold bg-onyx/80 p-8 backdrop-blur-sm shadow-gold md:-translate-y-3">
+      <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold px-5 py-1 text-[0.62rem] font-medium uppercase tracking-widest2 text-obsidian">Most Popular</span>
+      <h3 class="font-display text-2xl">Signature</h3>
+      <div class="mt-5 flex items-baseline gap-1">
+        <span class="font-display text-5xl font-light text-gold"><span class="price-el">29</span></span>
+        <span class="text-sm text-mist">/month</span>
+      </div>
+      <p class="mt-2 text-sm text-mist">For the devoted collector</p>
+      <ul class="mt-7 flex flex-1 flex-col gap-3.5 text-sm text-mist">
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Unlimited scent &amp; blend queries</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Full Blend Composer studio</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Wardrobe analytics dashboard</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Voice concierge, 6 languages</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Priority curations</li>
+      </ul>
+      <button class="mt-9 w-full rounded-full bg-gold py-3.5 text-xs font-medium uppercase tracking-widest2 text-obsidian transition-all duration-500 hover:bg-goldsoft hover:shadow-gold">Elevate</button>
+    </div>
+
+    <!-- Executive -->
+    <div class="gold-card rv flex flex-col rounded-4xl border border-line bg-onyx/70 p-8 backdrop-blur-sm">
+      <h3 class="font-display text-2xl">Atelier</h3>
+      <div class="mt-5 flex items-baseline gap-1">
+        <span class="font-display text-5xl font-light text-gold"><span class="price-el">79</span></span>
+        <span class="text-sm text-mist">/month</span>
+      </div>
+      <p class="mt-2 text-sm text-mist">For the house &amp; the insider</p>
+      <ul class="mt-7 flex flex-1 flex-col gap-3.5 text-sm text-mist">
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Everything in Signature</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Private AI sommelier</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Harvest &amp; commodity intel</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Custom formulation tools</li>
+        <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold"></span>Exclusive atelier events</li>
+      </ul>
+      <button class="mt-9 w-full rounded-full border border-line py-3.5 text-xs uppercase tracking-widest2 text-ivory transition-all duration-500 hover:border-gold hover:text-gold">Commission</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FAQ
+============================================================ -->
+<section id="faq" class="border-t border-line">
+  <div class="mx-auto max-w-3xl px-5 py-28 sm:px-8">
+    <div class="rv text-center">
+      <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">Common questions</p>
+      <h2 class="mt-4 font-display text-4xl font-light sm:text-5xl">Frequently asked</h2>
+    </div>
+    <div class="mt-12 flex flex-col gap-4">
+      <div class="faq-item rv rounded-3xl border border-line bg-onyx/60 backdrop-blur-sm">
+        <button class="faq-q flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+          <span class="font-display text-xl">How does Elora protect my scent data?</span>
+          <span class="plus-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-gold">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a px-6"><p class="pb-5 text-sm leading-relaxed text-mist">Zero-access encryption end to end. Your olfactory identity — preferences, skin chemistry, collection — is never used for training, never shared, and you can export or delete it anytime.</p></div>
+      </div>
+      <div class="faq-item rv rounded-3xl border border-line bg-onyx/60 backdrop-blur-sm">
+        <button class="faq-q flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+          <span class="font-display text-xl">Can Elora integrate with my collection app?</span>
+          <span class="plus-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-gold">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a px-6"><p class="pb-5 text-sm leading-relaxed text-mist">Yes — sync via our API with Parfumo, Fragrantica, Basenotes, or your own database. Import your library, wishlist, and reviews in a single click.</p></div>
+      </div>
+      <div class="faq-item rv rounded-3xl border border-line bg-onyx/60 backdrop-blur-sm">
+        <button class="faq-q flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+          <span class="font-display text-xl">Can I cancel anytime?</span>
+          <span class="plus-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-gold">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a px-6"><p class="pb-5 text-sm leading-relaxed text-mist">Absolutely. No contracts, no fees. Access continues to the end of the billing period, and your data can be exported before you go.</p></div>
+      </div>
+      <div class="faq-item rv rounded-3xl border border-line bg-onyx/60 backdrop-blur-sm">
+        <button class="faq-q flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+          <span class="font-display text-xl">How accurate are the blend recommendations?</span>
+          <span class="plus-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-gold">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a px-6"><p class="pb-5 text-sm leading-relaxed text-mist">Elora is validated against hundreds of published accords and nose-reviewed compositions, with a 98% harmony precision on tested pairings. It learns your skin chemistry over time.</p></div>
+      </div>
+      <div class="faq-item rv rounded-3xl border border-line bg-onyx/60 backdrop-blur-sm">
+        <button class="faq-q flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+          <span class="font-display text-xl">Which languages does Elora speak?</span>
+          <span class="plus-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-gold">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a px-6"><p class="pb-5 text-sm leading-relaxed text-mist">English, French, Italian, German, Spanish, and Japanese today, with voice support in the first two. More accents in the atelier queue.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA
+============================================================ -->
+<section class="relative overflow-hidden py-32">
+  <div class="pointer-events-none absolute left-1/2 top-1/2 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full" style="background: radial-gradient(circle, rgba(201,169,110,.10), transparent 60%);"></div>
+  <div class="rv relative mx-auto max-w-2xl px-5 text-center">
+    <p class="text-[0.7rem] uppercase tracking-widest2 text-gold">Begin the atelier</p>
+    <h2 class="mt-5 font-display text-4xl font-light sm:text-6xl">Your signature scent<br>is waiting to be found.</h2>
+    <p class="mx-auto mt-6 max-w-md text-mist">Join the private list and receive Elora's first composition — crafted for early members only.</p>
+    <form id="ctaForm" class="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
+      <input type="email" required placeholder="you@atelier.com" aria-label="Email address"
+             class="flex-1 rounded-full border border-line bg-white/[0.03] px-6 py-4 text-sm text-ivory outline-none placeholder:text-mist/60 focus:border-gold/50 transition-colors duration-500">
+      <button type="submit" class="group relative overflow-hidden rounded-full bg-gold px-8 py-4 text-xs font-medium uppercase tracking-widest2 text-obsidian transition-all duration-500 hover:bg-goldsoft hover:shadow-gold">
+        <span class="relative z-10">Reserve Access</span>
+        <span class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+      </button>
+    </form>
+    <p id="ctaMsg" class="mt-4 text-sm text-gold opacity-0 transition-opacity duration-500">Welcome to the atelier. Check your inbox.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer class="border-t border-line">
+  <div class="mx-auto max-w-7xl px-5 pb-10 pt-16 sm:px-8">
+    <div class="grid grid-cols-2 gap-10 md:grid-cols-12">
+      <div class="col-span-2 md:col-span-5">
+        <a href="#top" class="flex items-center gap-2.5">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-gold/10">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" stroke-width="1.5"><path d="M12 2C7 7 4 11 4 15a8 8 0 0 0 16 0c0-4-3-8-8-13z"/></svg>
+          </span>
+          <span class="font-display text-2xl">Elora<span class="text-gold">.</span></span>
+        </a>
+        <p class="mt-5 max-w-xs text-sm leading-relaxed text-mist">An AI concierge for the futuristic perfume house — note-reading, blending, and quiet luxury.</p>
+        <div class="mt-6 flex gap-3">
+          <a href="#" aria-label="Instagram" class="flex h-10 w-10 items-center justify-center rounded-full border border-line text-mist transition-all duration-400 hover:border-gold hover:text-gold hover:-translate-y-0.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="#" aria-label="X" class="flex h-10 w-10 items-center justify-center rounded-full border border-line text-mist transition-all duration-400 hover:border-gold hover:text-gold hover:-translate-y-0.5">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1.2 2h6.4l4.4 5.9L18.9 2zm-1.1 18h1.7L7.1 3.9H5.3L17.8 20z"/></svg>
+          </a>
+          <a href="#" aria-label="Pinterest" class="flex h-10 w-10 items-center justify-center rounded-full border border-line text-mist transition-all duration-400 hover:border-gold hover:text-gold hover:-translate-y-0.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 7a4 4 0 0 1 4 4c0 2-1 3-2.5 3S11 13 11 11v-1.5A1.5 1.5 0 0 1 12.5 8"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-[0.65rem] uppercase tracking-widest2 text-mist">Product</h4>
+        <ul class="mt-5 flex flex-col gap-3 text-sm text-mist">
+          <li><a href="#features" class="hover:text-gold transition-colors">Features</a></li>
+          <li><a href="#dashboard" class="hover:text-gold transition-colors">Dashboard</a></li>
+          <li><a href="#demo" class="hover:text-gold transition-colors">Live Demo</a></li>
+          <li><a href="#pricing" class="hover:text-gold transition-colors">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-[0.65rem] uppercase tracking-widest2 text-mist">House</h4>
+        <ul class="mt-5 flex flex-col gap-3 text-sm text-mist">
+          <li><a href="#" class="hover:text-gold transition-colors">About</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Atelier journal</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Careers</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Press</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-[0.65rem] uppercase tracking-widest2 text-mist">Support</h4>
+        <ul class="mt-5 flex flex-col gap-3 text-sm text-mist">
+          <li><a href="#" class="hover:text-gold transition-colors">Help center</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Contact</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Privacy</a></li>
+          <li><a href="#" class="hover:text-gold transition-colors">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-14 flex flex-col items-center justify-between gap-4 border-t border-line pt-8 sm:flex-row">
+      <p class="text-xs text-mist">© 2026 Elora Atelier. All rights reserved.</p>
+      <p class="text-xs text-mist">Privacy · Terms · Cookies</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   ELORA — vanilla JS
+===================================================================== */
+
+/* ---------- Scroll reveal ---------- */
+const rv = document.querySelectorAll('.rv');
+const rvObs = new IntersectionObserver((entries, obs) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('on'), i * 90);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+rv.forEach(el => rvObs.observe(el));
+
+/* ---------- Navbar blur + sliding dot ---------- */
+const navbar = document.getElementById('navbar');
+const navDot = document.getElementById('navDot');
+const links = document.querySelectorAll('#navLinks .nav-link');
+
+function placeDot(link) {
+  const r = link.getBoundingClientRect();
+  const c = link.closest('#navLinks').getBoundingClientRect();
+  navDot.style.left = (r.left - c.left + 6) + 'px';
+  navDot.style.width = (r.width - 12) + 'px';
+}
+
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('navbar-blur', window.scrollY > 40);
+  navbar.classList.toggle('bg-obsidian/85', window.scrollY > 40);
+  // active link on scroll
+  let current = 'features';
+  const y = window.scrollY + window.innerHeight / 3;
+  document.querySelectorAll('section[id]').forEach(sec => {
+    if (y >= sec.offsetTop) current = sec.id;
+  });
+  const activeLink = document.querySelector(`#navLinks a[href="#${current}"]`);
+  if (activeLink) placeDot(activeLink);
+}, { passive: true });
+
+window.addEventListener('resize', () => {
+  const active = document.querySelector('#navLinks a[href="#features"]');
+  if (active) placeDot(active);
+});
+
+setTimeout(() => placeDot(document.querySelector('#navLinks a[href="#features"]')), 300);
+
+/* ---------- Mobile menu ---------- */
+const burger = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobileMenu');
+let menuOpen = false;
+function setMenu(open) {
+  menuOpen = open;
+  burger.setAttribute('aria-expanded', open);
+  burger.style.opacity = open ? '0' : '1';
+  mobileMenu.classList.toggle('hidden', !open);
+  requestAnimationFrame(() => mobileMenu.style.opacity = open ? '1' : '0');
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+burger.addEventListener('click', () => setMenu(!menuOpen));
+document.querySelectorAll('.mobile-link').forEach(a => a.addEventListener('click', () => setMenu(false)));
+mobileMenu.querySelector('button').addEventListener('click', () => setMenu(false));
+
+/* ---------- Animated counters ---------- */
+const counters = document.querySelectorAll('[data-count]');
+const countObs = new IntersectionObserver((entries, obs) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    obs.unobserve(e.target);
+    const el = e.target;
+    const target = +el.dataset.count;
+    const dur = 1600;
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  });
+}, { threshold: 0.6 });
+counters.forEach(c => countObs.observe(c));
+
+/* ---------- Billing toggle ---------- */
+const toggle = document.getElementById('billingToggle');
+const knob = document.getElementById('toggleKnob');
+const lblM = document.getElementById('lblMonthly');
+const lblA = document.getElementById('lblAnnual');
+let annual = false;
+const prices = { el: [9, 29, 79], annualEl: [7, 23, 63] };
+const els = document.querySelectorAll('.price-el');
+toggle.addEventListener('click', () => {
+  annual = !annual;
+  knob.style.transform = annual ? 'translateX(28px)' : 'translateX(0)';
+  lblM.className = 'text-sm ' + (annual ? 'text-mist' : 'text-ivory');
+  lblA.className = 'text-sm ' + (annual ? 'text-ivory' : 'text-mist');
+  toggle.setAttribute('aria-checked', annual);
+  const vals = annual ? prices.annualEl : prices.el;
+  els.forEach((el, i) => {
+    el.style.opacity = '.2';
+    setTimeout(() => { el.textContent = vals[i]; el.style.opacity = '1'; }, 150);
+  });
+});
+toggle.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle.click(); }
+});
+
+/* ---------- FAQ ---------- */
+document.querySelectorAll('.faq-item').forEach(item => {
+  const btn = item.querySelector('.faq-q');
+  btn.addEventListener('click', () => {
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(f => f.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  });
+});
+
+/* ---------- Quick chips ---------- */
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.getElementById('chatInput').value = chip.textContent.trim();
+    sendMessage();
+  });
+});
+
+/* ---------- CHAT: Elora the fragrance AI ---------- */
+const chat = document.getElementById('chat');
+const input = document.getElementById('chatInput');
+const sendBtn = document.getElementById('chatSend');
+
+const NOTES = {
+  bergamot: 'Bergamot is a brilliant citrus top note — cool, almost peppery on the skin. Lifts any composition and glows on warm days.',
+  citrus: 'Citrus notes (bergamot, lemon, neroli) open bright and fade fast. Excellent in summer, and a fine bridge when layering with woods.',
+  iris: 'Iris or orris is powdery, elegant, and quietly expensive. It lends a soft classicism that suits both tailoring and evenings.',
+  jasmine: 'Jasmine is a heady, indolic floral that blooms at night. A little goes far — it is the heart of many great evening fragrances.',
+  rose: 'Rose spans green and fresh to deep, honeyed spice. Bulgarian rose is the benchmark for warmth and sensuality.',
+  oud: 'Oud (agarwood) is smoky, resinous, ancient. It is commanding — balance it with a smooth amber or soft leather to keep it refined.',
+  amber: 'Amber is warm, honeyed, and golden. It settles beautifully and pairs with almost anything; it is your safest base.',
+  sandalwood: 'Sandalwood is creamy, milky, and serene. It is the velvet of perfumery and a masterful blender with florals and citrus.',
+  vanilla: 'Vanilla is gourmand warmth and comfort. Use it to sweeten a woody base or soften a bright floral.',
+  vetiver: 'Vetiver is earthy, grassy, and grounded — smoky in Haitian style, greener in Java. A cornerstone for modern woody profiles.',
+  musk: 'Musk is skin-warm and subtle. Modern musks are clean and powdery, adding longevity without shouting.',
+  leather: 'Leather is dark, suede-like, and intimate. One of the most expensive-feeling accords when done well.',
+  patchouli: 'Patchouli is deep, earthy, and slightly chocolate-y. It grounds floral and amber compositions beautifully.',
+  lavender: 'Lavender is herbaceous and aromatic — crisp in fougère, dreamy when brushed onto amber.',
+  neroli: 'Neroli is the soul of orange blossom: bright, honeyed, and slightly sun-warmed. Wonderful against musk.',
+  oakmoss: 'Oakmoss is mossy, dark, forest-floor green. It anchors chypre classics and gives vintage depth.',
+  'sauvage': 'Dior Sauvage opens with a sharp bergamot and pepper spark, anchored by ambroxan and woods — loud, confident, and very masculine.',
+  'chanel no 5': 'Chanel No. 5 is aldehyde-led florals over powdery sandalwood — the invention that defined modern perfumery in 1921.',
+  'oud wood': 'Tom Ford Oud Wood layers oud with sandalwood, vetiver, and a whisper of rose — oriental without shouting. A masterclass in restraint.',
+  'terre': 'Hermès Terre d’Hermès is a flinty, mineral heart over orange and cedar — dry, striking, and unmistakably French.'
+};
+
+const BLENDS = {
+  'sandalwood vanilla': 'Sandalwood + vanilla is a warm, creamy duet — the vanilla sweetens the milk of the wood. Add a single drop of amber to make it linger.',
+  'jasmine citrus': 'Jasmine + citrus (bergamot or neroli) is brightness rising over a floral glow — ideal for daytime and early evenings.',
+  'rose oud': 'Rose + oud is the classic midnight pairing: the rose tames the smoke, the oud deepens the bloom. Exquisite for winter black-tie.',
+  'oakmoss citrus': 'Oakmoss + citrus is a modern chypre — crisp on top, dark underneath. Perfect for a tailored, confident day wear.',
+  'lavender amber': 'Lavender + amber is an aromatic hug — the herbal calm warms into honey as the night grows.',
+  'vanilla amber': 'Vanilla + amber is pure golden warmth, the coziest base you can build. Everything layered above it will feel smoother.',
+  'lemon vanilla': 'Lemon + vanilla is a bright, sunny gourmand — like a candlelit citrus dessert. Fresh but never childish.'
+};
+
+function addMsg(text, kind) {
+  const d = document.createElement('div');
+  d.className = kind === 'user'
+    ? 'max-w-[82%] self-end rounded-3xl rounded-tr-md border border-gold/25 bg-gold/10 px-4 py-3 text-sm leading-relaxed text-ivory'
+    : 'ai-msg max-w-[82%] self-start rounded-3xl rounded-tl-md border border-line bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-mist';
+  d.textContent = text;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+
+const typingDots = () => {
+  const d = document.createElement('div');
+  d.className = 'self-start flex gap-1.5 rounded-3xl rounded-tl-md border border-line bg-white/[0.04] px-4 py-3';
+  d.innerHTML = '<span class="tdot h-1.5 w-1.5 rounded-full bg-gold"></span><span class="tdot h-1.5 w-1.5 rounded-full bg-gold"></span><span class="tdot h-1.5 w-1.5 rounded-full bg-gold"></span>';
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+};
+
+function answer(q) {
+  q = q.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+  if (/mix|blend|layer|combine|pair|what go(es)? with/.test(q)) {
+    for (const k of Object.keys(BLENDS))
+      if (q.includes(k)) return BLENDS[k];
+    return "Great instinct to layer. As a rule: build on a stable base (amber, sandalwood, musk), add one heart note (rose, jasmine, iris), and finish with a bright top (bergamot, neroli). Want me to propose a specific combination?";
+  }
+  for (const k of Object.keys(NOTES))
+    if (q.includes(k)) return NOTES[k];
+  if (/night|evening|date|formal|black tie/.test(q)) return "For evenings, reach for smoked or resinous profiles: rose-oud, suede leather, or iris over dark amber. They breathe beautifully under warm light.";
+  if (/day|work|office|summer|morning/.test(q)) return "Daytime favors brightness: citrus over musk, neroli, or a light woody-sportive profile. Keep projection modest and the sillage a rumor, not an announcement.";
+  if (/hello|hi|hey/.test(q)) return "Hello, welcome to the atelier. Ask me about any note, or let me help you compose a blend.";
+  if (/thank/.test(q)) return "It is a pleasure. The atelier is always open — come back whenever you wish to explore further.";
+  return "A lovely question. Tell me a note you enjoy or a mood you're dressing for, and I'll guide you from there.";
+}
+
+function sendMessage() {
+  const v = input.value.trim();
+  if (!v) return;
+  addMsg(v, 'user');
+  input.value = '';
+  const t = typingDots();
+  const delay = 800 + Math.random() * 900;
+  setTimeout(() => {
+    t.remove();
+    addMsg(answer(v), 'ai');
+  }, delay);
+}
+
+sendBtn.addEventListener('click', sendMessage);
+input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+/* ---------- CTA form ---------- */
+document.getElementById('ctaForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const msg = document.getElementById('ctaMsg');
+  msg.classList.remove('opacity-0');
+  setTimeout(() => msg.classList.add('opacity-0'), 4000);
+  e.target.reset();
+});
+</script>
+</body>
+</html>
